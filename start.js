@@ -14,10 +14,14 @@ try {
   }
 } catch (e) {}
 
-// Start Backend (FastAPI on port 8000 with auto-reload)
-// Using single command string with shell: true avoids Node.js DEP0190 warning
-// Explicitly watch only backend code and exclude data/store files to avoid file-watcher race conditions on Windows
-const backend = spawn('python -m uvicorn backend.main:app --port 8000 --host 127.0.0.1 --reload --reload-dir backend --reload-exclude "demo_data/*" --reload-exclude "*.xlsx" --reload-exclude "*.csv" --reload-exclude "*.pdf"', {
+// Start Backend (FastAPI with dynamic PORT support for production)
+const port = process.env.PORT || 8000;
+const isProd = process.env.NODE_ENV === 'production';
+const uvicornCmd = isProd
+  ? `python -m uvicorn backend.main:app --port ${port} --host 0.0.0.0`
+  : `python -m uvicorn backend.main:app --port 8000 --host 0.0.0.0 --reload --reload-dir backend --reload-exclude "demo_data/*" --reload-exclude "*.xlsx" --reload-exclude "*.csv" --reload-exclude "*.pdf"`;
+
+const backend = spawn(uvicornCmd, {
   cwd: __dirname,
   shell: true,
   stdio: 'inherit'

@@ -1179,11 +1179,6 @@ from fastapi.responses import Response
 HTTP_CLIENT = httpx.AsyncClient(timeout=30.0)
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:3000").rstrip("/")
 
-@app.get("/", include_in_schema=False)
-def root_redirect():
-    from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/docs")
-
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
 async def proxy_frontend(request: Request, path: str = ""):
     if path.startswith("api/") or path == "api" or path.startswith("docs") or path == "openapi.json":
