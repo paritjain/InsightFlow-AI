@@ -35,4 +35,9 @@ services:
           type: web
           name: insightflow-backend
           property: host
+      - key: BACKEND_API_URL
+        fromService:
+          type: web
+          name: insightflow-backend
+          property: host
 
