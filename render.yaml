@@ -1,0 +1,37 @@
+services:
+  # Backend FastAPI Analytics Engine
+  - type: web
+    name: insightflow-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /docs
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PROJECT_CACHE_MAX_SIZE
+        value: "50"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: "gpt-4o-mini"
+
+  # Frontend Next.js Interface
+  - type: web
+    name: insightflow-frontend
+    env: node
+    region: oregon
+    plan: free
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run start"
+    envVars:
+      - key: NODE_ENV
+        value: "production"
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: insightflow-backend
+          property: host
