@@ -34,3 +34,4 @@ else
     echo "    Web App: https://${DOMAIN}"
     echo "    Backend API Docs: https://${DOMAIN}/docs"
 fi
+

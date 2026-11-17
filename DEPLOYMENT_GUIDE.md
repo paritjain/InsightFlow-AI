@@ -141,3 +141,4 @@ If you want to immediately showcase this running application to users on the int
 | `NEXT_PUBLIC_API_URL` | Frontend | `http://localhost:8000` | Public backend URL accessed by client browser |
 | `BACKEND_API_URL` | Frontend | `http://127.0.0.1:8000` | Internal backend URL for Next.js server rewrites |
 | `OPENAI_API_KEY` | Backend | *(Optional)* | Enables LLM natural language responses |
+

@@ -35,3 +35,4 @@ services:
           type: web
           name: insightflow-backend
           property: host
+
