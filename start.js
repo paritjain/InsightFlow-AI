@@ -1,5 +1,6 @@
 const { spawn, execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 console.log("=================================================");
 console.log(" Starting InsightFlow AI Unified Single Server");
@@ -14,12 +15,14 @@ try {
   }
 } catch (e) {}
 
-// Start Backend (FastAPI with dynamic PORT support for production)
 const port = process.env.PORT || 8000;
 const isProd = process.env.NODE_ENV === 'production';
+
+// Start Backend (FastAPI with auto-reload in dev, single process in prod)
+// Explicitly reload only backend code directory and exclude data/store files without shell wildcard expansion
 const uvicornCmd = isProd
   ? `python -m uvicorn backend.main:app --port ${port} --host 0.0.0.0`
-  : `python -m uvicorn backend.main:app --port 8000 --host 0.0.0.0 --reload --reload-dir backend --reload-exclude "demo_data/*" --reload-exclude "*.xlsx" --reload-exclude "*.csv" --reload-exclude "*.pdf"`;
+  : `python -m uvicorn backend.main:app --port ${port} --host 127.0.0.1 --reload --reload-dir backend --reload-exclude demo_data/*`;
 
 const backend = spawn(uvicornCmd, {
   cwd: __dirname,
@@ -27,11 +30,8 @@ const backend = spawn(uvicornCmd, {
   stdio: 'inherit'
 });
 
-const fs = require('fs');
-
 // Start Frontend (auto-detect dev vs production build)
 const hasBuild = fs.existsSync(path.join(__dirname, 'frontend', '.next'));
-const isProd = process.env.NODE_ENV === 'production';
 const frontendCmd = (isProd && hasBuild) ? 'npx next start -p 3000' : 'npx next dev -p 3000';
 
 const frontend = spawn(frontendCmd, {
@@ -57,4 +57,3 @@ const cleanup = () => {
 
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);
-
